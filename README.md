@@ -1,4 +1,4 @@
-# API TSE para download dos log das urnas
+# API TSE para download dos dados de votação das urnas
 
 ## Params:
 - `cod_turno`:
