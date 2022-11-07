@@ -3,17 +3,17 @@
 
 Após as eleições presidenciais 2022 do Brasil existiram algumas denúncias de que o resultado das eleições pode ter sido afetado por anomalias detectadas em versões antigas das urnas eletrônicas.
 
-As denúncias foram inicialmente publicadas por Fernando Cerimedo e seus relatórios estão disponíveis em /docs e também em https://brazilwasstolen.com.
+As denúncias foram inicialmente publicadas por Fernando Cerimedo e seus relatórios estão disponíveis em `/docs` e também em https://brazilwasstolen.com.
 
-O objetivo desse projeto é fazer o download dos resultados de votação diretamento do TSE, enriquecer os dados com informações que estão espalhadas em outros arquivos do TSE e disponibilizar o arquivo `.csv` final para que qualquer um possa fazer a análise nos dados.
+O objetivo desta aplicação é fazer o download dos resultados de votação diretamento do TSE, enriquecer os dados com informações que estão espalhadas em outros arquivos do TSE e disponibilizar o arquivo `.csv` final para que qualquer um possa fazer a análise nos dados.
 
 `[EN-us]`
 
-After the presidential elections of Brazil in 2022, some complaints were filed arguing that the election results could be affected by some anomalous patterns found in old ballot models.
+After the presidential elections of Brazil in 2022, some complaints were filed arguing that the election results could have been affected by some anomalous patterns found in old ballot box models.
 
 The reports were originally published by Fernando Cerimedo. His reports are available in `/docs` and at https://brazilwasstolen.com.
 
-The purpose of this project is to download the election results from TSE API, enrich the files by adding information found in other TSE files, and make the final `.csv` file available for everyone to build their own data analysis.
+The purpose of this application is to download the election results from TSE API, enrich the files by adding information found in other TSE files, and make the final `.csv` file available for everyone to build their own data analysis.
 
 ## Build 
 ```
