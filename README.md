@@ -20,8 +20,14 @@ The purpose of this application is to download the election results from TSE API
 bundle install
 ```
 ## Run
-```
+
+```bash
+# Run the entire download process
 rake run
+
+# Download the log file of a ballot box
+# rake download_logs"[estado, cod_municipio, zona, secao, cod_turno(406|407), dest_folder]"
+rake download_logs"[BA, 35114, 21, 204, 407, /tmp]"
 ```
 ## Requirements
 - Ruby
