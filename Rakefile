@@ -1,7 +1,7 @@
 require "rspec/core/rake_task"
 require_relative "lib/csv_downloader.rb"
 require_relative "lib/csv_processor.rb"
-require_relative "lib/device_model_collector.rb"
+require_relative "lib/processors/device_model_processor.rb"
 require_relative "lib/logs_downloader.rb"
 
 RSpec::Core::RakeTask.new(:spec)

@@ -1,12 +1,14 @@
 require 'csv'
 require_relative "common/constants.rb"
-require_relative "device_model_collector.rb"
+require_relative "processors/device_model_processor.rb"
 
 class CsvProcessor
-  attr_reader :workspace
+  attr_reader :workspace, :tmp
   
   def initialize(workspace)
     @workspace = workspace
+    @tmp = File.join(workspace, "tmp")
+    FileUtils.mkdir_p(tmp)
   end
 
   def enrich_csv_file(csv_path, dest_file)
@@ -14,7 +16,7 @@ class CsvProcessor
     current_data = {}
 
     CSV.open(dest_file, "wb", encoding: ENCODING) do |csv|
-      csv << ["NR_TURNO", "SG_UF", "CD_MUNICIPIO", "NM_MUNICIPIO", "NR_ZONA", "NR_SECAO", "CD_CARGO_PERGUNTA", "QT_APTOS", "QT_COMPARECIMENTO", "QT_ABSTENCOES", "CD_TIPO_VOTAVEL", "QT_VOTOS_BRANCO", "QT_VOTOS_NULO", "QT_VOTOS_13", "QT_VOTOS_22", "MODELO_URNA"]
+      write_header(csv)
       total_locations = count_locations(csv_path)
       current_location_seq = 1
 
@@ -63,6 +65,10 @@ class CsvProcessor
 
   private
 
+  def write_header(csv)
+    csv << ["NR_TURNO", "SG_UF", "CD_MUNICIPIO", "NM_MUNICIPIO", "NR_ZONA", "NR_SECAO", "CD_CARGO_PERGUNTA", "QT_APTOS", "QT_COMPARECIMENTO", "QT_ABSTENCOES", "CD_TIPO_VOTAVEL", "QT_VOTOS_BRANCO", "QT_VOTOS_NULO", "QT_VOTOS_13", "QT_VOTOS_22", "MODELO_URNA", "HORA_PRIMEIRO_VOTO", "HORA_ULTIMO_VOTO"]
+  end
+
   def count_locations(csv_path)
     count = 0
     pk = ""
@@ -82,7 +88,14 @@ class CsvProcessor
   def write_row_to_csv(csv, current_data)
     c = current_data
 
-    device_model = DeviceModelCollector.new(workspace).get_device_model_from_location(c["SG_UF"], c["CD_MUNICIPIO"], c["NR_ZONA"], c["NR_SECAO"], c["CD_PLEITO"])
+    logs_downloader = LogsDownloader.new(workspace, c["SG_UF"], c["CD_MUNICIPIO"], c["NR_ZONA"], c["NR_SECAO"], c["CD_PLEITO"])
+    logjez_file_path = logs_downloader.fetch_logs
+    log_path = LogsDownloader.extract_logjez_file(logjez_file_path, tmp)
+
+    device_model = DeviceModelProcessor.new(workspace).get_device_model(log_path)
+    vote_time_processor = VoteTimeProcessor.new
+    vote_time_processor.process(log_path, COD_TURNO_DATA[c["CD_PLEITO"]])
+
     csv << [
       c["NR_TURNO"], 
       c["SG_UF"],
@@ -99,7 +112,9 @@ class CsvProcessor
       c["QT_VOTOS_NULO"],
       c["QT_VOTOS_13"],
       c["QT_VOTOS_22"],
-      device_model
+      device_model,
+      vote_time_processor.first_vote_at,
+      vote_time_processor.last_vote_at,
     ]
   end
 end

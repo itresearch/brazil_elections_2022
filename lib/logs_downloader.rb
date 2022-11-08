@@ -1,6 +1,7 @@
+require "seven_zip_ruby"
 class LogsDownloader
 
-  attr_reader :estado, :cod_municipio, :zona, :secao, :cod_turno, :workspace
+  attr_reader :estado, :cod_municipio, :zona, :secao, :cod_turno, :workspace, :logjez_file
 
   def initialize(workspace, estado, cod_municipio, zona, secao, cod_turno)
     @workspace = workspace
@@ -15,13 +16,14 @@ class LogsDownloader
     logs_folder = File.join(workspace, "logs", estado, cod_municipio)
     FileUtils.mkdir_p(logs_folder)
 
-    dest_path = File.join(logs_folder, "#{estado}-#{cod_municipio}-#{zona}-#{secao}-#{cod_turno}.logjez")
+    logjez_file = File.join(logs_folder, "#{estado}-#{cod_municipio}-#{zona}-#{secao}-#{cod_turno}.logjez")
 
-    download_logs(dest_path) unless File.exist?(dest_path)
-    dest_path
+    download_logs(logjez_file) unless File.exist?(logjez_file)
+    logjez_file
   end
 
   def download_logs(dest_path)
+    @logjez_file = dest_path
     tmp_path = dest_path + ".tmp"
     hash = get_hash
     url = "https://resultados.tse.jus.br/oficial/ele2022/arquivo-urna/#{cod_turno}/dados/#{estado}/#{cod_municipio}/#{zona}/#{secao}/#{hash}/o00#{cod_turno}-#{cod_municipio}#{zona}#{secao}.logjez"
@@ -36,6 +38,13 @@ class LogsDownloader
     end
     File.rename(tmp_path, dest_path)
     dest_path
+  end
+
+  def self.extract_logjez_file(logjez_file, dest_folder)
+    File.open(logjez_file, "rb") do |file|
+      SevenZipRuby::Reader.extract_all(file, dest_folder)
+    end
+    File.join(dest_folder, "logd.dat")
   end
 
   private 
