@@ -11,17 +11,31 @@ class LogsDownloader
     @cod_turno = cod_turno
   end
 
+  def fetch_logs
+    logs_folder = File.join(workspace, "logs", estado, cod_municipio)
+    FileUtils.mkdir_p(logs_folder)
+
+    dest_path = File.join(logs_folder, "#{estado}-#{cod_municipio}-#{zona}-#{secao}-#{cod_turno}.logjez")
+
+    download_logs(dest_path) unless File.exist?(dest_path)
+    dest_path
+  end
+
   def download_logs(dest_path)
+    tmp_path = dest_path + ".tmp"
     hash = get_hash
     url = "https://resultados.tse.jus.br/oficial/ele2022/arquivo-urna/#{cod_turno}/dados/#{estado}/#{cod_municipio}/#{zona}/#{secao}/#{hash}/o00#{cod_turno}-#{cod_municipio}#{zona}#{secao}.logjez"
     File.delete(dest_path) if File.exist?(dest_path)
-    File.open(dest_path, "wb") do |file|
+    File.delete(tmp_path) if File.exist?(tmp_path)
+    File.open(tmp_path, "wb") do |file|
       file.binmode
 
       HTTParty.get(url, stream_body: true, headers: { "User-Agent" => "downloader" }) do |fragment|
         file.write(fragment)
       end
     end
+    File.rename(tmp_path, dest_path)
+    dest_path
   end
 
   private 

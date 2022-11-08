@@ -14,12 +14,9 @@ class DeviceModelCollector
   end
 
   def get_device_model_from_location(estado, cod_municipio, zona, secao, cod_turno)
-    logjez_file_path = File.join(tmp, "tmp-log.logjez")
-    LogsDownloader.new(workspace, estado, cod_municipio, zona, secao, cod_turno).download_logs(logjez_file_path)
+    logjez_file_path = LogsDownloader.new(workspace, estado, cod_municipio, zona, secao, cod_turno).fetch_logs
 
     result = get_device_model_from_zip(logjez_file_path)
-
-    File.delete(logjez_file_path) if File.exist?(logjez_file_path)
 
     result
   end

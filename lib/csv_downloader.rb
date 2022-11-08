@@ -19,6 +19,8 @@ class CsvDownloader
       url = "https://cdn.tse.jus.br/estatistica/sead/eleicoes/eleicoes2022/buweb/bweb_2t_#{state}_311020221535.zip"
 
       zip_file = File.join(tmp, "#{state}.zip")
+      next if File.exist?(zip_file)
+
       puts "Downloading #{state} file to #{zip_file}"
 
       File.open(zip_file, "w") do |file|
