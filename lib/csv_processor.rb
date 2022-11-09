@@ -1,6 +1,7 @@
 require 'csv'
 require_relative "common/constants.rb"
 require_relative "processors/device_model_processor.rb"
+require_relative "processors/auth_type_processor.rb"
 
 class CsvProcessor
   attr_reader :workspace, :tmp
@@ -66,7 +67,10 @@ class CsvProcessor
   private
 
   def write_header(csv)
-    csv << ["NR_TURNO", "SG_UF", "CD_MUNICIPIO", "NM_MUNICIPIO", "NR_ZONA", "NR_SECAO", "CD_CARGO_PERGUNTA", "QT_APTOS", "QT_COMPARECIMENTO", "QT_ABSTENCOES", "CD_TIPO_VOTAVEL", "QT_VOTOS_BRANCO", "QT_VOTOS_NULO", "QT_VOTOS_13", "QT_VOTOS_22", "MODELO_URNA", "HORA_PRIMEIRO_VOTO", "HORA_ULTIMO_VOTO"]
+    csv << ["NR_TURNO", "SG_UF", "CD_MUNICIPIO", "NM_MUNICIPIO", "NR_ZONA", "NR_SECAO", "CD_CARGO_PERGUNTA", "QT_APTOS", "QT_COMPARECIMENTO", "QT_ABSTENCOES",
+       "CD_TIPO_VOTAVEL", "QT_VOTOS_BRANCO", "QT_VOTOS_NULO", "QT_VOTOS_13", "QT_VOTOS_22", "MODELO_URNA", "HORA_PRIMEIRO_VOTO_LOG", "HORA_ULTIMO_VOTO", 
+       "NUM_ELEITORES_BIOMETRIA", "NUM_ELEITORES_MANUAL"
+    ]
   end
 
   def count_locations(csv_path)
@@ -96,6 +100,9 @@ class CsvProcessor
     vote_time_processor = VoteTimeProcessor.new
     vote_time_processor.process(log_path, COD_TURNO_DATA[c["CD_PLEITO"]])
 
+    auth_processor = AuthTypeProcessor.new
+    auth_processor.process(log_path, COD_TURNO_DATA[c["CD_PLEITO"]])
+
     csv << [
       c["NR_TURNO"], 
       c["SG_UF"],
@@ -115,6 +122,8 @@ class CsvProcessor
       device_model,
       vote_time_processor.first_vote_at,
       vote_time_processor.last_vote_at,
+      auth_processor.biometric_count,
+      auth_processor.manual_count
     ]
   end
 end

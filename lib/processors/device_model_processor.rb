@@ -37,7 +37,7 @@ class DeviceModelProcessor
     File.open(log_file, encoding: ENCODING) do |file|
       line = file.find { |line| line.include?(MODEL_FIELD) }
       start_ix = line.index(MODEL_FIELD) + MODEL_FIELD.size
-      line[start_ix..(line.index("\t", start_ix))]
+      line[start_ix..(line.index("\t", start_ix) - 1)]
     end
   end
 

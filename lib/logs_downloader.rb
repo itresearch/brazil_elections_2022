@@ -45,6 +45,9 @@ class LogsDownloader
       SevenZipRuby::Reader.extract_all(file, dest_folder)
     end
     File.join(dest_folder, "logd.dat")
+  rescue => e
+    puts "[E] Error extracting log: #{logjez_file}. Error: #{e}"
+    File.join(dest_folder, "logd-err.dat")
   end
 
   private 
